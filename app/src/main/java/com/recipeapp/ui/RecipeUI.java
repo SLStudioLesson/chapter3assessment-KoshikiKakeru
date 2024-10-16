@@ -4,7 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.List;
+
+import com.recipeapp.datahandler.CSVDataHandler;
+import com.recipeapp.datahandler.DataHandler;
+import com.recipeapp.model.Ingredient;
+import com.recipeapp.model.Recipe;
 
 public class RecipeUI {
     private BufferedReader reader;
@@ -14,7 +18,7 @@ public class RecipeUI {
         reader = new BufferedReader(new InputStreamReader(System.in));
         this.dataHandler = dataHandler;
     }
-    
+
     public void displayMenu() {
 
         System.out.println("Current mode: " + dataHandler.getMode());
@@ -33,6 +37,7 @@ public class RecipeUI {
 
                 switch (choice) {
                     case "1":
+                        displayRecipies();
                         break;
                     case "2":
                         break;
@@ -48,6 +53,40 @@ public class RecipeUI {
             } catch (IOException e) {
                 System.out.println("Error reading input from user: " + e.getMessage());
             }
+        }
+    }
+
+    public void displayRecipies() {
+        // DataHandlerから読み込んだレシピデータを整形してコンソールに表示します。
+        // IOExceptionを受け取った場合はError reading file: 例外のメッセージとコンソールに表示します
+        // レシピの表示
+        System.out.println("");
+        System.out.println("Recipies:");
+        System.out.println("-----------------------------------");
+
+        try {
+            ArrayList<Recipe> recipies = new ArrayList<>();
+            CSVDataHandler handler = new CSVDataHandler();
+            recipies = handler.readData();
+            // ファイルが空だった場合
+            if (recipies.size() == 0) {
+                System.out.println("No recipes available.");
+            } else {
+                for (int i = 0; i < recipies.size(); i++) {
+                    Recipe recipe = recipies.get(i);
+                    System.out.println("Recipe Name: " + recipe.getName());
+                    System.out.print("Main Ingredients: ");
+
+                    ArrayList<Ingredient> ingredients = new ArrayList<>();
+                    ingredients = recipe.getIngredients();
+                    for (Ingredient ing : ingredients) {
+                        System.out.print(ing);
+                    }
+                    System.out.println("-----------------------------------");
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading file: 例外のメッセージ");
         }
     }
 }
